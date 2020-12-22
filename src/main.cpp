@@ -1,24 +1,37 @@
 #include <iostream>
 #include <fstream>
 #include <time.h>
+#include "functions.h"
 #include "MPA.h"
+#include "Dataset.h"
 #include <math.h>
-
-double testFittingFunction(std::vector<int> location)
-{
-	double x = (double)location[0] / 1000.0;
-	double y = (double)location[1] / 1000.0;
-	double r = sqrt(x*x + y*y);
-	return sin(r)/r;
-}
+#include "Logger.h"
 
 
 int main()
 {
 	srand(time(NULL));
-	 MPA testObj(2, {{-10000,10000}, {-10000,10000}}, testFittingFunction, 10);
-	testObj.initializePopulation();
-	testObj.writePopulationWithFitting();
-	testObj.runSimulation();
-	
+	Dataset data("dataFiles/iris.data");
+	double avgSimilarity = 0;
+	for(int i = 0; i < 10; i++)
+	{
+		data.shuffle();
+		std::vector<Dimension> dimensions = functions::createDimensionsRanges({{4,8}, {2,5},{1,7},{0,3}}, 2, 3);
+		MPA testObj(20, dimensions, 3, 1000, data, 2);
+		// testObj.writePopulationWithFitting();
+		testObj.runSimulation();
+		std::vector<std::vector<double>> centroids = functions::separateCoordinates(testObj.getBestEver().getLocation(), 3, 2);
+		Dataset resultSet = data;
+		resultSet.clearLabels();
+		resultSet.setPossibleLabels(data.getPossibleLabels());
+		resultSet.assignPointsToClusters(centroids);
+		for(auto& num : resultSet.getLabelsDistribution())
+		{
+			std::cout << num << "\t";
+		}
+		std::cout << "\nSimilarity: " << functions::compareLabeling(resultSet, data)*100 << "%\n";
+		avgSimilarity += functions::compareLabeling(resultSet, data)*100;
+	}
+	avgSimilarity /= 10;
+	std::cout << "Avg result: " << avgSimilarity << std::endl;
 }

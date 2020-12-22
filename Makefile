@@ -48,6 +48,7 @@ release: all
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
+	-@rm $(TARGET)
 
 info:
 	@echo "[*] Application dir: ${APP_DIR}     "
@@ -57,4 +58,5 @@ info:
 	@echo "[*] Dependencies:    ${DEPENDENCIES}"
 
 run:
-	$(APP_DIR)/$(TARGET)
+	cp $(APP_DIR)/$(TARGET) .
+	./$(TARGET)

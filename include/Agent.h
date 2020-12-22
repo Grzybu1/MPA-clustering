@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+#include <Dataset.h>
 struct Dimension
 {
 	int minValue;
@@ -18,18 +18,17 @@ enum Phases
 class Agent
 {
 public:
-	Agent(int dimensionNumber);
+	Agent(std::vector<Dimension> dimensionsRanges);
 	~Agent() = default;
-	void initialize(std::vector<Dimension> dimensionsRanges);
 
-	void calculateFitting(double(*fittingFunction)(std::vector<int>));
+	void calculateFitting(int clusterAmount, Dataset pointsToCluster, int precision);
 	double getFitting()const;
 
 	void writeLocation() const;
 	std::vector<int> getLocation()const;
 	void setLocation(std::vector<int> newLocation);
 	
-	void makeMove(Phases phase, Agent elitePredator, double(*fittingFunction)(std::vector<int>), double CF = 0);
+	void makeMove(Phases phase, Agent elitePredator, Dataset pointsToCluster, int clusterAmount, int precision, double CF = 0);
 
 	Agent operator*(const std::vector<double>& rhs) const;
 	Agent operator*(const Agent& rhs) const;
@@ -40,4 +39,5 @@ private:
 	std::vector<int> location;
 	double fitting;
 	std::vector<int> calculateMove(Phases phase, Agent elitePredator);
+	std::vector<Dimension> dimensionsRanges;
 };

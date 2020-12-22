@@ -2,23 +2,27 @@
 #include <vector>
 #include <utility>
 #include "Agent.h"
-
+#include "Dataset.h"
+#include "FittingFunction.h"
 class MPA
 {
 public:
-	MPA(int populationSize, std::vector<Dimension> dimensionsRanges, double(*fittingFunction)(std::vector<int>), int stepsNumber);
+	MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision);
 	~MPA() = default;
-	void initializePopulation();
 	void writePopulationWithFitting() const;
 	std::vector<Agent> getPopulation();
 	void runSimulation();
+	Agent* getElitePredator();
+	Agent& getBestEver();
 private:
-	double (*fittingFunction)(std::vector<int>);
 	std::vector<Agent> population;
 	std::vector<Dimension> dimensionsRanges;
 	Agent *elitePredator;
+	int clusterAmount;
 	int stepsNumber;
-	
+	Dataset pointsToCluster;
+	int precision;
+	Agent bestEver;
 	void calculatePopulationFitting();
 	void findElitePredator();
 	double calculateAdaptiveParameter(int currentStep);

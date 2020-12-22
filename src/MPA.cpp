@@ -3,31 +3,23 @@
 #include <math.h>
 #include <iostream>
 #include <Distributions.h>
-
-MPA::MPA(int populationSize, std::vector<Dimension> dimensionsRanges, double(*fittingFunction)(std::vector<int>), int stepsNumber)
-:fittingFunction(fittingFunction), dimensionsRanges(dimensionsRanges), elitePredator(nullptr), stepsNumber(stepsNumber)
+MPA::MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision)
+:dimensionsRanges(dimensionsRanges), elitePredator(nullptr), clusterAmount(clusterAmount), stepsNumber(stepsNumber), pointsToCluster(pointsToCluster), precision(precision), bestEver(dimensionsRanges)
 {
 	for(int i = 0; i < populationSize; i++)
 	{
-		population.push_back(Agent(dimensionsRanges.size()));
-	}
-}
-
-void MPA::initializePopulation()
-{
-	for(auto &agent : population)
-	{
-		agent.initialize(dimensionsRanges);
+		population.push_back(Agent(dimensionsRanges));
 	}
 	calculatePopulationFitting();
 	findElitePredator();
+	bestEver = *elitePredator;
 }
 
 void MPA::calculatePopulationFitting()
 {
 	for(auto &agent : population)
 	{
-		agent.calculateFitting(fittingFunction);
+		agent.calculateFitting(clusterAmount, pointsToCluster, precision);
 	}
 }
 
@@ -69,6 +61,8 @@ void MPA::applyFADs(int currentStep, double FADs)
 	{
 		int dimensionsNumber = agent.getLocation().size();
 		double r = Distributions::randUniformVector(1)[0];
+		std::vector<int> newLocation;
+		newLocation.resize(agent.getLocation().size(), 0);
 		if(r <= FADs)
 		{
 			std::vector<int> U;
@@ -83,8 +77,9 @@ void MPA::applyFADs(int currentStep, double FADs)
 			{
 				int dimWidth = dimensionsRanges[i].maxValue - dimensionsRanges[i].minValue;
 				double change = CF * (dimensionsRanges[i].minValue + R[i] * dimWidth);
-				agent.getLocation()[i] += round(change) * U[i];
+				newLocation[i] = agent.getLocation()[i] + round(change) * U[i];
 			}
+			agent.setLocation(newLocation);
 		}
 		else
 		{
@@ -97,9 +92,9 @@ void MPA::applyFADs(int currentStep, double FADs)
 			{
 				int changeVector = population[r2].getLocation()[i] - population[r1].getLocation()[i];
 				int locationChange = (FADs * (1 - r) + r) * changeVector;
-				agent.getLocation()[i] += locationChange;
+				newLocation[i] = agent.getLocation()[i] + locationChange;
 			}
-
+			agent.setLocation(newLocation);
 		}
 	}
 }
@@ -114,7 +109,7 @@ void MPA::runSimulation()
 		{
 			for(auto& agent : population)
 			{
-				agent.makeMove(PHASE_1, *elitePredator, fittingFunction);
+				agent.makeMove(PHASE_1, *elitePredator, pointsToCluster, clusterAmount, precision);
 			}
 		}
 		else if(step < secondPhaseMaxStep)
@@ -123,9 +118,9 @@ void MPA::runSimulation()
 			{
 				double CF = calculateAdaptiveParameter(step);
 				if(i % 2)
-					population[i].makeMove(PHASE_2_A, *elitePredator, fittingFunction);
+					population[i].makeMove(PHASE_2_A, *elitePredator, pointsToCluster, clusterAmount, precision);
 				else
-					population[i].makeMove(PHASE_2_B, *elitePredator, fittingFunction, CF);
+					population[i].makeMove(PHASE_2_B, *elitePredator, pointsToCluster, clusterAmount, precision, CF);
 			}
 		}
 		else
@@ -133,15 +128,33 @@ void MPA::runSimulation()
 			double CF = calculateAdaptiveParameter(step);
 			for(auto& agent : population)
 			{
-				agent.makeMove(PHASE_3, *elitePredator, fittingFunction, CF);
+				agent.makeMove(PHASE_3, *elitePredator, pointsToCluster, clusterAmount, precision, CF);
 			}
 		}
 		findElitePredator();
-
-		std::cout << "Step: " << step <<"\nElite coordinates: ";
-		elitePredator->writeLocation();
-		std::cout << "\nElite fitting: " << elitePredator->getFitting() << std::endl << std::endl;
-		
 		applyFADs(step);
+
+		calculatePopulationFitting();
+		findElitePredator();
+		if(elitePredator -> getFitting() > bestEver.getFitting())
+			bestEver = *elitePredator;
+
+		if(step % 100 == 0)
+		{
+			std::cout << "Step: " << step <<"\nElite coordinates: ";
+			elitePredator->writeLocation();
+			std::cout << "\nElite fitting: " << elitePredator->getFitting() << std::endl;
+			std::cout << "Best ever fitting: " << bestEver.getFitting() << std::endl << std::endl;
+		}
 	}
+}
+
+Agent* MPA::getElitePredator()
+{
+	return elitePredator;
+}
+
+Agent& MPA::getBestEver()
+{
+	return bestEver;
 }

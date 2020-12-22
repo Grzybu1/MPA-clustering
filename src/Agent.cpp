@@ -3,14 +3,12 @@
 #include <iostream>
 #include <math.h>
 #include "Distributions.h"
+#include "FittingFunction.h"
 
-Agent::Agent(int dimensionNumber)
+Agent::Agent(std::vector<Dimension> dimensionsRanges)
+:dimensionsRanges(dimensionsRanges)
 {
-	location.assign(dimensionNumber, 0);
-}
-
-void Agent::initialize(std::vector<Dimension> dimensionsRanges)
-{
+	location.assign(dimensionsRanges.size(), 0);
 	for (int i = 0; i < (int)location.size(); i++)
 	{
 		int dimRange = dimensionsRanges[i].maxValue - dimensionsRanges[i].minValue;
@@ -38,7 +36,7 @@ double Agent::getFitting() const
 
 Agent Agent::operator*(const std::vector<double>& rhs) const
 {
-	Agent result(this->location.size());
+	Agent result(this -> dimensionsRanges);
 	for(int i = 0; i < (int)this->location.size(); i++)
 	{
 		result.location[i] = round(this->location[i] * rhs[i]);
@@ -48,17 +46,17 @@ Agent Agent::operator*(const std::vector<double>& rhs) const
 
 Agent Agent::operator*(const Agent& rhs) const
 {
-	Agent result(this->location.size());
-	for(int i = 0; i < (int)this->location.size(); i++)
+	Agent result(this->dimensionsRanges);
+	for(int i = 0; i < (int)this -> location.size(); i++)
 	{
-		result.location[i] = this->location[i] * rhs.getLocation()[i];
+		result.location[i] = this -> location[i] * rhs.getLocation()[i];
 	}
 	return result;
 }
 
 Agent Agent::operator-(const Agent& rhs) const
 {
-	Agent result(this->location.size());
+	Agent result(this -> dimensionsRanges);
 	for(int i = 0; i < (int)this->location.size(); i++)
 	{
 		result.location[i] = this->location[i] - rhs.getLocation()[i];
@@ -68,7 +66,7 @@ Agent Agent::operator-(const Agent& rhs) const
 
 Agent Agent::operator+(const Agent& rhs) const
 {
-	Agent result(this->location.size());
+	Agent result(this -> dimensionsRanges);
 	for(int i = 0; i < (int)this->location.size(); i++)
 	{
 		result.location[i] = this->location[i] + rhs.getLocation()[i];
@@ -78,7 +76,7 @@ Agent Agent::operator+(const Agent& rhs) const
 
 Agent Agent::operator+(const std::vector<int>& rhs) const
 {
-	Agent result(this->location.size());
+	Agent result(this -> dimensionsRanges);
 	for(int i = 0; i < (int)this->location.size(); i++)
 	{
 		result.location[i] = this->location[i] + rhs[i];
@@ -88,12 +86,20 @@ Agent Agent::operator+(const std::vector<int>& rhs) const
 
 void Agent::setLocation(std::vector<int> newLocation)
 {
-	location = newLocation;	
+	for(int dim = 0; dim < (int)dimensionsRanges.size(); dim++)
+	{
+		if(newLocation[dim] < dimensionsRanges[dim].minValue)
+			location[dim] = dimensionsRanges[dim].minValue;
+		else if(newLocation[dim] > dimensionsRanges[dim].maxValue)
+			location[dim] = dimensionsRanges[dim].maxValue;
+		else
+			location[dim] = newLocation[dim];
+	}
 }
 
 std::vector<int> Agent::calculateMove(Phases phase, Agent elitePredator)
 {
-	Agent result(location.size());
+	Agent result(dimensionsRanges);
 	switch(phase)
 	{
 		case PHASE_1:
@@ -124,18 +130,19 @@ std::vector<int> Agent::calculateMove(Phases phase, Agent elitePredator)
 	return result.getLocation();
 }
 
-void Agent::calculateFitting(double(*fittingFunction)(std::vector<int>))
+void Agent::calculateFitting(int clusterAmount, Dataset pointsToCluster, int precision)
 {
-	fitting = fittingFunction(location);
+	FittingFunction fittingFunction(pointsToCluster);
+	fitting = fittingFunction.calculateFitting(location, clusterAmount, precision);
 }
 
-void Agent::makeMove(Phases phase, Agent elitePredator, double(*fittingFunction)(std::vector<int>), double CF)
+void Agent::makeMove(Phases phase, Agent elitePredator, Dataset pointsToCluster, int clusterAmount, int precision, double CF)
 {
 	std::vector<int> calculatedStep = calculateMove(phase, elitePredator);
 	int actualStep;
 
 	std::vector<int> newLocation;
-	Agent newAgent(location.size());
+	Agent newAgent(dimensionsRanges);
 
 	if(phase == PHASE_1 || phase == PHASE_2_A)
 	{
@@ -156,7 +163,7 @@ void Agent::makeMove(Phases phase, Agent elitePredator, double(*fittingFunction)
 		}
 		newAgent.setLocation(newLocation);
 	}
-	newAgent.calculateFitting(fittingFunction);
+	newAgent.calculateFitting(clusterAmount, pointsToCluster, precision);
 	if(newAgent.getFitting() > fitting)
 	{
 		location = newLocation;

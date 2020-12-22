@@ -3,11 +3,11 @@
 #include <utility>
 #include "Agent.h"
 #include "Dataset.h"
-#include "FittingFunction.h"
+#include "FittingFunctionSimple.h"
 class MPA
 {
 public:
-	MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision);
+	MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision, const FittingFunctionBase& fittingFunction);
 	~MPA() = default;
 	void writePopulationWithFitting() const;
 	std::vector<Agent> getPopulation();
@@ -23,6 +23,7 @@ private:
 	Dataset pointsToCluster;
 	int precision;
 	Agent bestEver;
+	const FittingFunctionBase& fittingFunction;
 	void calculatePopulationFitting();
 	void findElitePredator();
 	double calculateAdaptiveParameter(int currentStep);

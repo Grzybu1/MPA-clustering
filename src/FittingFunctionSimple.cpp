@@ -1,11 +1,11 @@
-#include <FittingFunction.h>
+#include <FittingFunctionSimple.h>
 #include <math.h>
 #include <iostream>
-FittingFunction::FittingFunction(Dataset pointsToCluster)
-:pointsToCluster(pointsToCluster)
+FittingFunctionSimple::FittingFunctionSimple(const Dataset& pointsToCluster)
+:FittingFunctionBase(pointsToCluster)
 {}
 
-double FittingFunction::calculateFitting(std::vector<int> coordinates, int clusterAmount, int precision)
+double FittingFunctionSimple::calculateFitting(std::vector<int> coordinates, int clusterAmount, int precision)const
 {
 	double result = 0;
 	std::vector<std::vector<double>> centroids = functions::separateCoordinates(coordinates, clusterAmount, precision);

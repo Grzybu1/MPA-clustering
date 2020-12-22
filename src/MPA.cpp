@@ -3,8 +3,8 @@
 #include <math.h>
 #include <iostream>
 #include <Distributions.h>
-MPA::MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision)
-:dimensionsRanges(dimensionsRanges), elitePredator(nullptr), clusterAmount(clusterAmount), stepsNumber(stepsNumber), pointsToCluster(pointsToCluster), precision(precision), bestEver(dimensionsRanges)
+MPA::MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision, const FittingFunctionBase& fittingFunction)
+:dimensionsRanges(dimensionsRanges), elitePredator(nullptr), clusterAmount(clusterAmount), stepsNumber(stepsNumber), pointsToCluster(pointsToCluster), precision(precision), bestEver(dimensionsRanges), fittingFunction(fittingFunction) 
 {
 	for(int i = 0; i < populationSize; i++)
 	{
@@ -19,7 +19,7 @@ void MPA::calculatePopulationFitting()
 {
 	for(auto &agent : population)
 	{
-		agent.calculateFitting(clusterAmount, pointsToCluster, precision);
+		agent.calculateFitting(clusterAmount, precision, fittingFunction);
 	}
 }
 
@@ -109,7 +109,7 @@ void MPA::runSimulation()
 		{
 			for(auto& agent : population)
 			{
-				agent.makeMove(PHASE_1, *elitePredator, pointsToCluster, clusterAmount, precision);
+				agent.makeMove(PHASE_1, fittingFunction, *elitePredator, clusterAmount, precision);
 			}
 		}
 		else if(step < secondPhaseMaxStep)
@@ -118,9 +118,9 @@ void MPA::runSimulation()
 			{
 				double CF = calculateAdaptiveParameter(step);
 				if(i % 2)
-					population[i].makeMove(PHASE_2_A, *elitePredator, pointsToCluster, clusterAmount, precision);
+					population[i].makeMove(PHASE_2_A, fittingFunction, *elitePredator, clusterAmount, precision);
 				else
-					population[i].makeMove(PHASE_2_B, *elitePredator, pointsToCluster, clusterAmount, precision, CF);
+					population[i].makeMove(PHASE_2_B, fittingFunction, *elitePredator, clusterAmount, precision, CF);
 			}
 		}
 		else
@@ -128,7 +128,7 @@ void MPA::runSimulation()
 			double CF = calculateAdaptiveParameter(step);
 			for(auto& agent : population)
 			{
-				agent.makeMove(PHASE_3, *elitePredator, pointsToCluster, clusterAmount, precision, CF);
+				agent.makeMove(PHASE_3, fittingFunction, *elitePredator, clusterAmount, precision, CF);
 			}
 		}
 		findElitePredator();

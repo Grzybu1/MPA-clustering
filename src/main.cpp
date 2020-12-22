@@ -6,6 +6,7 @@
 #include "Dataset.h"
 #include <math.h>
 #include "Logger.h"
+#include "FittingFunctionSimple.h"
 
 
 int main()
@@ -16,8 +17,9 @@ int main()
 	for(int i = 0; i < 10; i++)
 	{
 		data.shuffle();
+		FittingFunctionSimple fittingFunction(data);
 		std::vector<Dimension> dimensions = functions::createDimensionsRanges({{4,8}, {2,5},{1,7},{0,3}}, 2, 3);
-		MPA testObj(20, dimensions, 3, 1000, data, 2);
+		MPA testObj(20, dimensions, 3, 1000, data, 2, fittingFunction);
 		// testObj.writePopulationWithFitting();
 		testObj.runSimulation();
 		std::vector<std::vector<double>> centroids = functions::separateCoordinates(testObj.getBestEver().getLocation(), 3, 2);

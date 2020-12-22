@@ -3,7 +3,8 @@
 #include <iostream>
 #include <math.h>
 #include "Distributions.h"
-#include "FittingFunction.h"
+#include "FittingFunctionSimple.h"
+#include "FittingFunctionBase.h"
 
 Agent::Agent(std::vector<Dimension> dimensionsRanges)
 :dimensionsRanges(dimensionsRanges)
@@ -130,13 +131,12 @@ std::vector<int> Agent::calculateMove(Phases phase, Agent elitePredator)
 	return result.getLocation();
 }
 
-void Agent::calculateFitting(int clusterAmount, Dataset pointsToCluster, int precision)
+void Agent::calculateFitting(int clusterAmount, int precision, const FittingFunctionBase& fittingFunction)
 {
-	FittingFunction fittingFunction(pointsToCluster);
 	fitting = fittingFunction.calculateFitting(location, clusterAmount, precision);
 }
 
-void Agent::makeMove(Phases phase, Agent elitePredator, Dataset pointsToCluster, int clusterAmount, int precision, double CF)
+void Agent::makeMove(Phases phase, const FittingFunctionBase& fittingFunction, Agent elitePredator, int clusterAmount, int precision, double CF)
 {
 	std::vector<int> calculatedStep = calculateMove(phase, elitePredator);
 	int actualStep;
@@ -163,7 +163,7 @@ void Agent::makeMove(Phases phase, Agent elitePredator, Dataset pointsToCluster,
 		}
 		newAgent.setLocation(newLocation);
 	}
-	newAgent.calculateFitting(clusterAmount, pointsToCluster, precision);
+	newAgent.calculateFitting(clusterAmount, precision, fittingFunction);
 	if(newAgent.getFitting() > fitting)
 	{
 		location = newLocation;

@@ -14,7 +14,7 @@ namespace Distributions
 		gsl_rng_set(generator, rand());
 		for(int i = 0; i < vectorLength; i++)
 		{
-			result.push_back(gsl_ran_gaussian(generator ,1.0));
+			result.push_back(gsl_ran_gaussian(generator ,0.2));
 		}
 		gsl_rng_free(generator);
 		return result;

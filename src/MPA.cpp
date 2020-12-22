@@ -52,7 +52,7 @@ std::vector<Agent> MPA::getPopulation()
 
 double MPA::calculateAdaptiveParameter(int currentStep)
 {
-	return pow(1 - (currentStep / stepsNumber), 2 * (currentStep / stepsNumber));
+	return pow(1 - ((double)currentStep / (double)stepsNumber), 2 * ((double)currentStep / (double)stepsNumber));
 }
 
 void MPA::applyFADs(int currentStep, double FADs)
@@ -77,6 +77,8 @@ void MPA::applyFADs(int currentStep, double FADs)
 			{
 				int dimWidth = dimensionsRanges[i].maxValue - dimensionsRanges[i].minValue;
 				double change = CF * (dimensionsRanges[i].minValue + R[i] * dimWidth);
+				if(dimensionsRanges[i].minValue > 0 && (double)rand()/RAND_MAX < 0.5)
+					change *= -1;
 				newLocation[i] = agent.getLocation()[i] + round(change) * U[i];
 			}
 			agent.setLocation(newLocation);
@@ -97,6 +99,8 @@ void MPA::applyFADs(int currentStep, double FADs)
 			agent.setLocation(newLocation);
 		}
 	}
+	calculatePopulationFitting();
+	findElitePredator();
 }
 
 void MPA::runSimulation()
@@ -131,11 +135,11 @@ void MPA::runSimulation()
 				agent.makeMove(PHASE_3, fittingFunction, *elitePredator, clusterAmount, precision, CF);
 			}
 		}
+
 		findElitePredator();
+		
 		applyFADs(step);
 
-		calculatePopulationFitting();
-		findElitePredator();
 		if(elitePredator -> getFitting() > bestEver.getFitting())
 			bestEver = *elitePredator;
 

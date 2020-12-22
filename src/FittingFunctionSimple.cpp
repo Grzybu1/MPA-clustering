@@ -30,6 +30,7 @@ double FittingFunctionSimple::calculateFitting(std::vector<int> coordinates, int
 		numberOfPointsInCluster[bestLabel]++;
 		sumOfClusterDistances[bestLabel] += bestLabelDistance;
 	}
+	int emptyClusters = 0;
 	for(int cluster = 0; cluster < (int)numberOfPointsInCluster.size(); cluster++)
 	{
 		if(numberOfPointsInCluster[cluster] != 0)
@@ -38,9 +39,9 @@ double FittingFunctionSimple::calculateFitting(std::vector<int> coordinates, int
 		}
 		else
 		{
-			result += 1000;
+			emptyClusters ++;
 		}
 	}
 	result /= (double)points.size();
-	return (-1) * result;
+	return  (1.0/result) - emptyClusters;
 }

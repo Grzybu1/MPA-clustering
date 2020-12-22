@@ -16,7 +16,7 @@ std::vector<Dimension> functions::createDimensionsRanges(std::vector<Dimension> 
 	return result;
 }
 
-double functions::calculateEuclideanDistanceBetweenVectors(std::vector<double> firstVec, std::vector<double> secondVec)
+double functions::calculateEuclideanDistanceBetweenVectors(const std::vector<double>& firstVec, const std::vector<double>& secondVec)
 {
 	double result = 0;
 	for(int index = 0; index < (int)firstVec.size(); index++)
@@ -48,20 +48,45 @@ double functions::compareLabeling(const Dataset& first, const Dataset& second)
 	int numOfLabels = (int)first.getPossibleLabels().size();
 	double bestResult = 0;
 	double result;
+	int elementsAmount = first.getData().size();
+	for(int firstLabelToSwap = 0; firstLabelToSwap < numOfLabels; firstLabelToSwap++)
+	{
+		for(int secondLabelToSwap = firstLabelToSwap+1; secondLabelToSwap < numOfLabels; secondLabelToSwap++)
+		{
+			result = 0;
+			Dataset tmp = second;
+			for(int i = 0; i < elementsAmount; i++)
+			{
+				if(tmp.getData()[i].label == firstLabelToSwap)
+					tmp.setLabel(i, secondLabelToSwap);
+				else if(tmp.getData()[i].label == secondLabelToSwap)
+					tmp.setLabel(i, firstLabelToSwap);
+			}
+			for(int i = 0; i < elementsAmount; i++)
+			{
+				if(first.getData()[i].label == tmp.getData()[i].label)
+					result++;
+			}
+			result /= (double)elementsAmount;
+			if(result > bestResult)
+				bestResult = result;
+		}
+	}
+
 	for(int reLabel = 0; reLabel < numOfLabels; reLabel++)
 	{
 		result = 0;
 		Dataset tmp = second;
-		for(int i = 0; i < (int)tmp.getData().size(); i++)
+		for(int i = 0; i < elementsAmount; i++)
 		{
 			tmp.setLabel(i, (tmp.getData()[i].label + reLabel) % numOfLabels);
 		}
-		for(int i = 0; i < (int)first.getData().size(); i++)
+		for(int i = 0; i < elementsAmount; i++)
 		{
 			if(first.getData()[i].label == tmp.getData()[i].label)
 				result++;
 		}
-		result /= (double)first.getData().size();
+		result /= (double)elementsAmount;
 		if(result > bestResult)
 			bestResult = result;
 	}

@@ -143,13 +143,17 @@ void Agent::makeMove(Phases phase, const FittingFunctionBase& fittingFunction, A
 
 	std::vector<int> newLocation;
 	Agent newAgent(dimensionsRanges);
-
+	double P = 0.5;
 	if(phase == PHASE_1 || phase == PHASE_2_A)
 	{
 		std::vector<double> R = Distributions::randUniformVector(location.size());
 		for(int i = 0; i < (int)location.size(); i++)
 		{
-			actualStep = round(R[i] * 0.5 * (double)calculatedStep[i]);
+			actualStep = round(R[i] * P * (double)calculatedStep[i]);
+			/*if(phase == PHASE_1)
+				std::cout << "Brownian Step: " << actualStep << std::endl;
+			else
+				std::cout << "Levy Step: " << actualStep << std::endl;*/
 			newLocation.push_back(location[i] + actualStep);
 		}
 		newAgent.setLocation(newLocation);
@@ -159,6 +163,11 @@ void Agent::makeMove(Phases phase, const FittingFunctionBase& fittingFunction, A
 		for(int i = 0; i < (int)location.size(); i++)
 		{
 			actualStep = round(CF * 0.5 * (double)calculatedStep[i]);
+			/*if(phase == PHASE_2_B)
+				std::cout << "Brownian Step: " << actualStep << std::endl;
+			else
+				std::cout << "Levy Step: " << actualStep << std::endl;*/
+			
 			newLocation.push_back(elitePredator.getLocation()[i] + actualStep);
 		}
 		newAgent.setLocation(newLocation);

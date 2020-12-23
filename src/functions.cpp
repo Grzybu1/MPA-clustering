@@ -1,15 +1,15 @@
 #include "functions.h"
 #include <iostream>
-std::vector<Dimension> functions::createDimensionsRanges(std::vector<Dimension> baseDimensions, int precision, int clusterAmount)
+std::vector<Dimension> functions::createDimensionsRanges(int precision, int dimensionsAmount, int clusterAmount)
 {
 	std::vector<Dimension> result;
 	for(int i = 0; i < clusterAmount; i++)
 	{
-		for(auto& dimension : baseDimensions)
+		for(int j = 0; j < dimensionsAmount; j++)
 		{
 			Dimension multipliedDimension;
-			multipliedDimension.minValue = dimension.minValue * pow(10, precision);
-			multipliedDimension.maxValue = dimension.maxValue * pow(10, precision);
+			multipliedDimension.minValue = 0;
+			multipliedDimension.maxValue = pow(10, precision);
 			result.push_back(multipliedDimension);
 		}
 	}

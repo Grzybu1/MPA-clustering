@@ -36,7 +36,7 @@ double CelinskiHarabaszFittingFunction::calculateFitting(std::vector<int> coordi
 	int pointsAmount = pointsToCluster.getData().size();
 	double indexValue = (betweenClusterVariance / withinClusterVariance) * (pointsAmount - clusterAmount)/(clusterAmount - 1);
 
-	return indexValue - emptyClusters * indexValue;
+	return indexValue - emptyClusters * pow(10, precision);
 }
 
 double CelinskiHarabaszFittingFunction::calculateBetweenClusterVariance(std::vector<int> coordinates, int clusterAmount, int precision)const

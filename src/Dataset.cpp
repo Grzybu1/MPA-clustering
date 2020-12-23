@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <random>
 #include "functions.h"
-Dataset::Dataset(std::string dataFileName)
+Dataset::Dataset(std::string dataFileName, int labelPosition)
 {
 	std::fstream file;
 	file.open(dataFileName, std::ios::in);
@@ -32,13 +32,18 @@ Dataset::Dataset(std::string dataFileName)
 			continue;
 
 		data.resize(data.size()+1);
-		for(int i = 0; i < (int) singleRow.size()-1; i++)
+		for(int i = 0; i < (int) singleRow.size(); i++)
 		{
-			data[iterator].actualData.push_back(std::stof(singleRow[i].c_str()));
+			if(i == labelPosition)
+			{
+				data[iterator].label = labelToInt(singleRow[i].c_str());
+			}
+			else
+			{
+				data[iterator].actualData.push_back(std::stof(singleRow[i].c_str()));
+			}
 		}
 		
-		data[iterator].label = labelToInt(singleRow.back().c_str());
-
 		iterator++;
 	}
 }
@@ -89,6 +94,28 @@ void Dataset::shuffle()
 	auto randDevice = std::random_device{};
 	auto randEngine = std::default_random_engine{randDevice()};
 	std::shuffle(data.begin(), data.end(), randEngine);
+}
+
+void Dataset::normalize()
+{
+	for(int dim = 0; dim < (int)data[0].actualData.size(); dim++)
+	{
+		double min = data[0].actualData[dim];
+		double max = data[0].actualData[dim];
+
+		for(auto& entry : data)
+		{
+			if(entry.actualData[dim] > max)
+				max = entry.actualData[dim];
+			if(entry.actualData[dim] < min)
+				min = entry.actualData[dim];
+		}
+
+		for(auto& entry : data)
+		{
+			entry.actualData[dim] = (entry.actualData[dim] - min) / (max - min);
+		}
+	}
 }
 
 std::vector<DataEntry> Dataset::getData()const

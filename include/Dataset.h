@@ -11,13 +11,14 @@ struct DataEntry
 class Dataset
 {
 public:
-	Dataset(std::string dataFileName);
+	Dataset(std::string dataFileName, int labelPosition);
 	~Dataset() = default;
 	int labelToInt(std::string labelToEncode);
 	std::string intToLabel(int labelToDecode) const;
 	void printWithLabels() const;
 	void printWithIntLabels() const;
 	void shuffle();
+	void normalize();
 	std::vector<DataEntry> getData()const;
 	void setLabel(int index, int label);
 	void clearLabels();

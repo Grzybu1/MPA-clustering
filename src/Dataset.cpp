@@ -8,6 +8,9 @@
 #include <algorithm>
 #include <random>
 #include "functions.h"
+Dataset::Dataset()
+{}
+
 Dataset::Dataset(std::string dataFileName, int labelPosition)
 {
 	std::fstream file;
@@ -142,7 +145,7 @@ void Dataset::setPossibleLabels(std::vector<std::pair<std::string, int>> newPoss
 	possibleLabels = newPossibleLabels;
 }
 
-std::vector<int> Dataset::getLabelsDistribution()
+std::vector<int> Dataset::getLabelsDistribution()const
 {
 	std::vector<int> result;
 	result.resize(possibleLabels.size(), 0);

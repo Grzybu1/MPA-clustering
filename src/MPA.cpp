@@ -3,6 +3,7 @@
 #include <math.h>
 #include <iostream>
 #include <Distributions.h>
+#include "Logger.h"
 MPA::MPA(int populationSize, std::vector<Dimension> dimensionsRanges, int clusterAmount, int stepsNumber, Dataset pointsToCluster, int precision, const FittingFunctionBase& fittingFunction)
 :dimensionsRanges(dimensionsRanges), elitePredator(nullptr), clusterAmount(clusterAmount), stepsNumber(stepsNumber), pointsToCluster(pointsToCluster), precision(precision), bestEver(dimensionsRanges), fittingFunction(fittingFunction) 
 {
@@ -140,14 +141,15 @@ void MPA::runSimulation()
 
 		if(elitePredator -> getFitting() > bestEver.getFitting())
 			bestEver = *elitePredator;
-
-		if(step % 100 == 0)
+		
+		Logger::instance().saveIndexesToFilesAtStep(bestEver.getLocation(), step);
+		/*if(step % 100 == 0)
 		{
 			std::cout << "Step: " << step <<"\nElite coordinates: ";
 			elitePredator->writeLocation();
 			std::cout << "\nElite fitting: " << elitePredator->getFitting() << std::endl;
 			std::cout << "Best ever fitting: " << bestEver.getFitting() << std::endl << std::endl;
-		}
+		}*/
 	}
 }
 

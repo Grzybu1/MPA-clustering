@@ -11,6 +11,7 @@ struct DataEntry
 class Dataset
 {
 public:
+	Dataset();
 	Dataset(std::string dataFileName, int labelPosition);
 	~Dataset() = default;
 	int labelToInt(std::string labelToEncode);
@@ -23,7 +24,7 @@ public:
 	void setLabel(int index, int label);
 	void clearLabels();
 	void setPossibleLabels(std::vector<std::pair<std::string, int>> newPossibleLabels);
-	std::vector<int> getLabelsDistribution();
+	std::vector<int> getLabelsDistribution()const;
 	void assignPointsToClusters(std::vector<std::vector<double>> centroids);
 	std::vector<std::pair<std::string, int>> getPossibleLabels()const;
 private:

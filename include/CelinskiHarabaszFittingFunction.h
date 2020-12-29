@@ -7,7 +7,7 @@ public:
 	CelinskiHarabaszFittingFunction(const Dataset& pointsToCluster);
 	~CelinskiHarabaszFittingFunction() = default;
 	virtual double calculateFitting(std::vector<int> coordinates, int clusterAmount, int precision)const override;
-
+	double calculateIndex(std::vector<int> coordinates, int clusterAmount, int precision)const;
 private:
 	std::vector<double> datasetCenter;
 	double calculateBetweenClusterVariance(std::vector<int> coordinates, int clusterAmount, int precision)const;

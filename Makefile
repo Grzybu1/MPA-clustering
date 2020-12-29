@@ -33,7 +33,7 @@ $(APP_DIR)/$(TARGET): $(OBJECTS)
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info run
+.PHONY: all build clean debug release info run clean_output
 
 build:
 	@mkdir -p $(APP_DIR)
@@ -60,3 +60,7 @@ info:
 run:
 	cp $(APP_DIR)/$(TARGET) .
 	./$(TARGET)
+
+clean_output:
+	-@rm ./outputFiles/indexesByStep/*.csv
+	-@rm ./outputFiles/overallResults/*.csv

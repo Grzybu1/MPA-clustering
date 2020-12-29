@@ -23,19 +23,15 @@ CelinskiHarabaszFittingFunction::CelinskiHarabaszFittingFunction(const Dataset& 
 double CelinskiHarabaszFittingFunction::calculateFitting(std::vector<int> coordinates, int clusterAmount, int precision)const
 {
 	Dataset clusteredData = pointsToCluster;
-	std::vector<std::vector<double>> centriods = functions::separateCoordinates(coordinates, clusterAmount, precision);
-	clusteredData.assignPointsToClusters(centriods);
+	std::vector<std::vector<double>> centroids = functions::separateCoordinates(coordinates, clusterAmount, precision);
+	clusteredData.assignPointsToClusters(centroids);
 	int emptyClusters = 0;
 	for(auto& pointsAmount : clusteredData.getLabelsDistribution())
 	{
 		if(pointsAmount == 0)
 			emptyClusters++;
 	}
-	double betweenClusterVariance = calculateBetweenClusterVariance(coordinates, clusterAmount, precision);
-	double withinClusterVariance = calculateWithinClusterVariance(coordinates, clusterAmount, precision);
-	int pointsAmount = pointsToCluster.getData().size();
-	double indexValue = (betweenClusterVariance / withinClusterVariance) * (pointsAmount - clusterAmount)/(clusterAmount - 1);
-
+	double indexValue = calculateIndex(coordinates, clusterAmount, precision);
 	return indexValue - emptyClusters * pow(10, precision);
 }
 
@@ -43,11 +39,11 @@ double CelinskiHarabaszFittingFunction::calculateBetweenClusterVariance(std::vec
 {
 	double result = 0;
 	Dataset clusteredData = pointsToCluster;
-	std::vector<std::vector<double>> centriods = functions::separateCoordinates(coordinates, clusterAmount, precision);
-	clusteredData.assignPointsToClusters(centriods);
+	std::vector<std::vector<double>> centroids = functions::separateCoordinates(coordinates, clusterAmount, precision);
+	clusteredData.assignPointsToClusters(centroids);
 	for(int cluster = 0; cluster < clusterAmount; cluster++)
 	{
-		result += functions::calculateEuclideanDistanceBetweenVectors(centriods[cluster], datasetCenter) * clusteredData.getLabelsDistribution()[cluster];
+		result += functions::calculateEuclideanDistanceBetweenVectors(centroids[cluster], datasetCenter) * clusteredData.getLabelsDistribution()[cluster];
 	}
 	return result;
 }
@@ -56,11 +52,22 @@ double CelinskiHarabaszFittingFunction::calculateWithinClusterVariance(std::vect
 {
 	double result = 0;
 	Dataset clusteredData = pointsToCluster;
-	std::vector<std::vector<double>> centriods = functions::separateCoordinates(coordinates, clusterAmount, precision);
-	clusteredData.assignPointsToClusters(centriods);
+	std::vector<std::vector<double>> centroids = functions::separateCoordinates(coordinates, clusterAmount, precision);
+	clusteredData.assignPointsToClusters(centroids);
 	for(const auto& entry : clusteredData.getData())
 	{
-		result += functions::calculateEuclideanDistanceBetweenVectors(entry.actualData, centriods[entry.label]);
+		result += functions::calculateEuclideanDistanceBetweenVectors(entry.actualData, centroids[entry.label]);
 	}
 	return result;
+}
+
+double CelinskiHarabaszFittingFunction::calculateIndex(std::vector<int> coordinates, int clusterAmount, int precision)const
+{
+	double betweenClusterVariance = calculateBetweenClusterVariance(coordinates, clusterAmount, precision);
+	double withinClusterVariance = calculateWithinClusterVariance(coordinates, clusterAmount, precision);
+	
+	int pointsAmount = pointsToCluster.getData().size();
+	double indexValue = (betweenClusterVariance / withinClusterVariance) * (pointsAmount - clusterAmount)/(clusterAmount - 1);
+
+	return indexValue;
 }

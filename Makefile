@@ -64,3 +64,5 @@ run:
 clean_output:
 	-@rm ./outputFiles/indexesByStep/*.csv
 	-@rm ./outputFiles/overallResults/*.csv
+	-@rm ./outputFiles/hierarchicalResults/*.csv
+	-@rm ./outputFiles/dbscanResults/*.csv

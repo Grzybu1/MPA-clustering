@@ -74,7 +74,8 @@ void Cmeans::calculateNewCentroids(std::vector<std::vector<double>>& centroids)
 	centroids.resize(clusterAmount, std::vector<double> (dimNumber, 0));
 	std::vector<double> sumOfMemberships(clusterAmount, 0);
 	std::vector<DataEntry> data = dataToCluster.getData();
-	for(int point = 0; point < (int)data.size(); point++)
+	int dataSize = data.size();
+	for(int point = 0; point < dataSize; point++)
 	{
 		int label = data[point].label;
 		for(int i = 0; i < dimNumber; i++)
@@ -108,7 +109,8 @@ std::vector<int> Cmeans::mergeCoordinates(std::vector<std::vector<double>> centr
 void Cmeans::updatePointsMembership(const std::vector<std::vector<double>>& centroids)
 {
 	std::vector<DataEntry> data = dataToCluster.getData();
-	for(int i = 0; i < (int)data.size(); i++)
+	int dataSize = data.size();
+	for(int i = 0; i < dataSize; i++)
 	{
 		for(int j = 0; j < clusterAmount; j++)
 		{

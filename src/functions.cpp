@@ -146,15 +146,15 @@ double functions::calculateRandIndex(const Dataset& firstSet, const Dataset& sec
 	return ((double)correctAmount / (double)numOfElements) * correctGini + ((double)missedAmount / (double)numOfElements) * missedGini;
 }*/
 
-double functions::calculateGiniIndexForSingleSplit(const std::vector<int> split, const int& numOfElements)
-{
-	double result = 1;
-	for(const auto& numInCluster : split)
-	{
-		result -= pow(double(numInCluster) / double(numOfElements), 2);
-	}
-	return result;
-}
+// double functions::calculateGiniIndexForSingleSplit(const std::vector<int> split, const int& numOfElements)
+// {
+// 	double result = 1;
+// 	for(const auto& numInCluster : split)
+// 	{
+// 		result -= pow(double(numInCluster) / double(numOfElements), 2);
+// 	}
+// 	return result;
+// }
 
 /*std::vector<int> getCorrectLabelsNumber(const Dataset& first, const Dataset& second)
 {

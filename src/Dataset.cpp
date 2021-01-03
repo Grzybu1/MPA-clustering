@@ -142,6 +142,7 @@ void Dataset::clearLabels()
 
 void Dataset::setPossibleLabels(std::vector<std::pair<std::string, int>> newPossibleLabels)
 {
+	possibleLabels.clear();
 	possibleLabels = newPossibleLabels;
 }
 
@@ -151,7 +152,14 @@ std::vector<int> Dataset::getLabelsDistribution()const
 	result.resize(possibleLabels.size(), 0);
 	for(auto& entry : data)
 	{
-		result[entry.label]++;
+		for(int i = 0; i < (int)possibleLabels.size(); i++)
+		{
+			if(entry.label == possibleLabels[i].second)
+			{
+				result[i]++;
+				break;
+			}
+		}	
 	}
 	return result;
 }

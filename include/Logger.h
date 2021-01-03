@@ -24,4 +24,6 @@ public:
     void setDataInfo(Dataset& data, std::string name, int amount, int prec);
     void saveIndexesToFilesAtStep(std::vector<int> coordinates, int step);
     void saveIndexesToFilesAtTheEnd(std::vector<std::vector<int>> multipleCoordinates);
+    void saveDbscanResultToFile(const Dataset& clusteredData);
+    void saveHierarchicalResultToFile(const Dataset& clusteredData);
 }; 

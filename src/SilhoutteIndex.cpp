@@ -11,27 +11,25 @@ double SilhoutteIndex::calculateFitting(std::vector<int> coordinates, int cluste
 	std::vector<std::vector<double>> centroids = functions::separateCoordinates(coordinates, clusterAmount, precision);
 	clusteredData.assignPointsToClusters(centroids);
 
-	std::vector<double> pointsInnerDistance = calculatePointsInnerDistance(clusteredData);
-	std::vector<double> pointsOuterDistance = calculatePointsOuterDistance(clusteredData, clusterAmount);
-	double result = 0;
-	for(int point = 0; point < (int)clusteredData.getData().size(); point++)
+	int emptyClusters = 0;
+	for(auto& pointsAmount : clusteredData.getLabelsDistribution())
 	{
-		double a = pointsInnerDistance[point];
-		double b = pointsOuterDistance[point];
-		if(a != -2)
-			result += (b - a) / (b > a ? b : a);
+		if(pointsAmount == 0)
+			emptyClusters++;
 	}
-	return result / clusteredData.getData().size();
+	double index = calculateIndex(coordinates, clusterAmount, precision);
+	return index - emptyClusters * clusterAmount;
 }
 
 std::vector<double> SilhoutteIndex::calculatePointsInnerDistance(const Dataset& clusteredData)const
 {
 	std::vector<double> result;
 	std::vector<int> numOfPointsInClusters = clusteredData.getLabelsDistribution();
-	for(const auto& firstPoint : clusteredData.getData())
+	std::vector<DataEntry> data = clusteredData.getData();
+	for(const auto& firstPoint : data)
 	{
 		double sum = 0;
-		for(const auto& secondPoint : clusteredData.getData())
+		for(const auto& secondPoint : data)
 		{
 			if(&firstPoint == &secondPoint)
 				continue;
@@ -50,12 +48,12 @@ std::vector<double> SilhoutteIndex::calculatePointsOuterDistance(const Dataset& 
 {
 	std::vector<double> result;
 	std::vector<int> numOfPointsInClusters = clusteredData.getLabelsDistribution();
-	
-	for(const auto& firstPoint : clusteredData.getData())
+	std::vector<DataEntry> data = clusteredData.getData();
+	for(const auto& firstPoint : data)
 	{
 		std::vector<double> sum;
 		sum.resize(clusterAmount, 0);
-		for(const auto& secondPoint : clusteredData.getData())
+		for(const auto& secondPoint : data)
 		{
 			if(firstPoint.label == secondPoint.label)
 				continue;
@@ -74,4 +72,24 @@ std::vector<double> SilhoutteIndex::calculatePointsOuterDistance(const Dataset& 
 		result.push_back(min);
 	}
 	return result;
+}
+
+double SilhoutteIndex::calculateIndex(std::vector<int> coordinates, int clusterAmount, int precision)const
+{
+	Dataset clusteredData = pointsToCluster;
+	std::vector<std::vector<double>> centroids = functions::separateCoordinates(coordinates, clusterAmount, precision);
+	clusteredData.assignPointsToClusters(centroids);
+
+	std::vector<double> pointsInnerDistance = calculatePointsInnerDistance(clusteredData);
+	std::vector<double> pointsOuterDistance = calculatePointsOuterDistance(clusteredData, clusterAmount);
+	double result = 0;
+	int dataSize = clusteredData.getData().size();
+	for(int point = 0; point < dataSize; point++)
+	{
+		double a = pointsInnerDistance[point];
+		double b = pointsOuterDistance[point];
+		if(a != -2)
+			result += (b - a) / (b > a ? b : a);
+	}
+	return result / dataSize;
 }

@@ -16,7 +16,6 @@ Dataset Dbscan::clusterData()
 	while(!isEveryPointVisited())
 	{
 		clusterIndex++;
-		// std::cout << "Szukam klastra " << clusterIndex <<std::endl;
 		int startingPointIndex = getStartingPointIndex();
 		bool isNoise = formClusterIfPossible(startingPointIndex, clusterIndex);
 		if(isNoise)
@@ -31,7 +30,6 @@ Dataset Dbscan::clusterData()
 			pointsStatus[startingPointIndex] = Core;
 			dataToCluster.setLabel(startingPointIndex, clusterIndex);
 			newPossibleLabels.push_back({std::to_string(clusterIndex), clusterIndex});
-			// std::cout << "O! Klaster!" <<std::endl;
 		}
 	}
 	dataToCluster.setPossibleLabels(newPossibleLabels);
@@ -78,23 +76,14 @@ std::vector<int> Dbscan::findNeighbours(const int& pointIndex)
 
 bool Dbscan::formClusterIfPossible(const int& startingPointIndex, const int& labelForCluster)
 {
-	// std::cout << "Indeks punktu startowego: " << startingPointIndex << std::endl;
 	std::vector<int> neighboursIndexes = findNeighbours(startingPointIndex);
-	// std::cout << "Indeksy sąsiadów: ";
-	// for(auto& pointIndex : neighboursIndexes)
-		// std::cout << pointIndex << ", ";
-	// std::cout << std::endl;
 	if((int)neighboursIndexes.size() < minPointsInCluster)
 	{
-		// std::cout << "Za mało sąsiadów, przerywam." << std::endl;
 		return true;
 	}
-	// std::cout << "Wystarczająco sąsiadów." << std::endl;
 
 	for(auto& pointIndex : neighboursIndexes)
 	{
-
-		// std::cout << "Sprawdzam punkt " << pointIndex << " o statusie " << pointsStatus[pointIndex] << std::endl;
 
 		if(pointsStatus[pointIndex] == Core || pointsStatus[pointIndex] == Border || pointsStatus[pointIndex] == Checking)
 			continue;

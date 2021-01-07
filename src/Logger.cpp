@@ -204,6 +204,6 @@ void Logger::saveHierarchicalResultToFile(const Dataset& clusteredData)
 	std::string outputFileName = "outputFiles/hierarchicalResults/" + dataName + ".csv";
 	file.open(outputFileName, std::ios::app);
 
-	file << "rand index" << std::endl;
+	file << "#rand index" << std::endl;
 	file << functions::calculateRandIndex(clusteredData, dataToCluster) << std::endl; 
 }

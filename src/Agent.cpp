@@ -150,10 +150,6 @@ void Agent::makeMove(Phases phase, const FittingFunctionBase& fittingFunction, A
 		for(int i = 0; i < (int)location.size(); i++)
 		{
 			actualStep = round(R[i] * P * (double)calculatedStep[i]);
-			/*if(phase == PHASE_1)
-				std::cout << "Brownian Step: " << actualStep << std::endl;
-			else
-				std::cout << "Levy Step: " << actualStep << std::endl;*/
 			newLocation.push_back(location[i] + actualStep);
 		}
 		newAgent.setLocation(newLocation);
@@ -162,12 +158,7 @@ void Agent::makeMove(Phases phase, const FittingFunctionBase& fittingFunction, A
 	{
 		for(int i = 0; i < (int)location.size(); i++)
 		{
-			actualStep = round(CF * 0.5 * (double)calculatedStep[i]);
-			/*if(phase == PHASE_2_B)
-				std::cout << "Brownian Step: " << actualStep << std::endl;
-			else
-				std::cout << "Levy Step: " << actualStep << std::endl;*/
-			
+			actualStep = round(CF * P * (double)calculatedStep[i]);
 			newLocation.push_back(elitePredator.getLocation()[i] + actualStep);
 		}
 		newAgent.setLocation(newLocation);

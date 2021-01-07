@@ -135,6 +135,7 @@ void MPA::runSimulation()
 			}
 		}
 		
+		findElitePredator();
 		applyFADs(step);
 		calculatePopulationFitting();
 		findElitePredator();
@@ -143,13 +144,6 @@ void MPA::runSimulation()
 			bestEver = *elitePredator;
 		
 		Logger::instance().saveIndexesToFilesAtStep(bestEver.getLocation(), step);
-		/*if(step % 100 == 0)
-		{
-			std::cout << "Step: " << step <<"\nElite coordinates: ";
-			elitePredator->writeLocation();
-			std::cout << "\nElite fitting: " << elitePredator->getFitting() << std::endl;
-			std::cout << "Best ever fitting: " << bestEver.getFitting() << std::endl << std::endl;
-		}*/
 	}
 }
 
